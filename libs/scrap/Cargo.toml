@@ -21,6 +21,10 @@ lazy_static = "1.4"
 hbb_common = { path = "../hbb_common" }
 webm = "1.0"
 
+[dev-dependencies]
+rdev = { path = "../rdev" }
+tokio = {version = "1.5", features=["sync", "macros", "rt-multi-thread"]}
+
 [dependencies.winapi]
 version = "0.3"
 default-features = true
@@ -42,6 +46,7 @@ repng = "0.2"
 docopt = "1.1"
 serde = {version="1.0", features=["derive"]}
 quest = "0.3"
+clap = { version = "4.4.6", features = ["derive"] }
 
 [build-dependencies]
 target_build_utils = "0.3"
