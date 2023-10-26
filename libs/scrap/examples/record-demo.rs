@@ -86,13 +86,18 @@ impl DemoCapture {
         let (action_sender, mut action_receiver) = mpsc::unbounded_channel::<Event>();
 
         let stop = Arc::new(AtomicBool::new(false));
+        let stop_act = Arc::new(AtomicBool::new(false));
         let start = Instant::now();
 
         thread::spawn({
             let stop = stop.clone();
+            let stop_act = stop_act.clone();
             move || {
                 let _ = quest::ask("Recording! Press ⏎ to stop.");
                 let _ = quest::text();
+
+                thread::sleep(Duration::from_secs(3));
+                stop_act.store(true, Ordering::Release);
                 stop.store(true, Ordering::Release);
             }
         });
@@ -107,10 +112,17 @@ impl DemoCapture {
         });
 
         tokio::task::spawn(async move {
-            loop {
+            while {
+                !stop_act.load(Ordering::Acquire)
+            }{
                 if let Some(e) = action_receiver.recv().await {
                     println!("Received {:?}", e);
-                    let data = format!("Received {:?}\n", e);
+
+                    let now = Instant::now();
+                    let time = now - start;
+                    let ms = time.as_secs() * 1000 + time.subsec_millis() as u64;
+
+                    let data = format!("{}\nReceived {:?}\n", ms, e);
                     let _ = act_buf.write(data.as_bytes());
                     let _ = act_buf.flush();
                 }
@@ -123,6 +135,8 @@ impl DemoCapture {
 
             if let Ok(frame) = screen_capturer.frame(Duration::from_millis(0)) {
                 let ms = time.as_secs() * 1000 + time.subsec_millis() as u64;
+
+                // println!(">>> {}", ms);
 
                 for frame in vpx.encode(ms as i64, &frame, STRIDE_ALIGN).unwrap() {
                     vt.add_frame(frame.data, frame.pts as u64 * 1_000_000, frame.key);
@@ -172,5 +186,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     let mut demo_capture = DemoCapture::new(args)?;
     let _ = demo_capture.record().await;
+    println!("Done");
     Ok(())
 }
