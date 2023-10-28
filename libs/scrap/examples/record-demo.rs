@@ -122,7 +122,7 @@ impl DemoCapture {
                     let time = now - start;
                     let ms = time.as_secs() * 1000 + time.subsec_millis() as u64;
 
-                    let data = format!("{}\nReceived {:?}\n", ms, e);
+                    let data = format!("ms:{},event_type:{:?}\n", ms, e.event_type);
                     let _ = act_buf.write(data.as_bytes());
                     let _ = act_buf.flush();
                 }
