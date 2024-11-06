@@ -76,10 +76,10 @@ impl DemoCapture {
                 quality: Quality::Best,
                 codec: vpx_codec,
                 keyframe_interval: None,
-            }))
+            }), true)
             .unwrap();
 
-        let mut screen_capturer = Capturer::new(display, true).unwrap();
+        let mut screen_capturer = Capturer::new(display).unwrap();
 
         let sleep_per_frame = Duration::from_nanos(1_000_000_000 / self.fps);
 
@@ -138,7 +138,10 @@ impl DemoCapture {
                     let ms = time.as_secs() * 1000 + time.subsec_millis() as u64;
                     println!(">>> {}", ms);
 
-                    for frame in vpx.encode(ms as i64, &frame, STRIDE_ALIGN).unwrap() {
+                    let mut yuv = Vec::new();
+                    let mut mid_data = Vec::new();
+                    frame.to(vpx.yuvfmt(), &mut yuv, &mut mid_data).unwrap();
+                    for frame in vpx.encode(ms as i64, &yuv, STRIDE_ALIGN).unwrap() {
                         vt.add_frame(frame.data, frame.pts as u64 * 1_000_000, frame.key);
                     }
                 }
