@@ -540,7 +540,7 @@ impl TransferJob {
         msg.set_file_response(resp);
         stream.send(&msg).await?;
         log::info!(
-            "id: {}, file_num:{}, digest message is sent. waiting for confirm. msg: {:?}",
+            "id: {}, file_num: {}, digest message is sent. waiting for confirm. msg: {:?}",
             self.id,
             self.file_num,
             msg
@@ -723,7 +723,7 @@ pub fn new_receive(
 
 #[inline]
 pub fn new_send(id: i32, path: String, file_num: i32, include_hidden: bool) -> Message {
-    log::info!("new send: {},id : {}", path, id);
+    log::info!("new send: {}, id: {}", path, id);
     let mut action = FileAction::new();
     action.set_send(FileTransferSendRequest {
         id,
@@ -836,6 +836,21 @@ pub fn remove_file(file: &str) -> ResultType<()> {
 pub fn create_dir(dir: &str) -> ResultType<()> {
     std::fs::create_dir_all(get_path(dir))?;
     Ok(())
+}
+
+#[inline]
+pub fn rename_file(path: &str, new_name: &str) -> ResultType<()> {
+    let path = std::path::Path::new(&path);
+    if path.exists() {
+        let dir = path
+            .parent()
+            .ok_or(anyhow!("Parent directoy of {path:?} not exists"))?;
+        let new_path = dir.join(&new_name);
+        std::fs::rename(&path, &new_path)?;
+        Ok(())
+    } else {
+        bail!("{path:?} not exists");
+    }
 }
 
 #[inline]

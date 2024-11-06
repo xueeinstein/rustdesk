@@ -1,3 +1,4 @@
+import 'package:flutter_hbb/common.dart';
 import 'package:get/get.dart';
 
 import '../consts.dart';
@@ -9,22 +10,22 @@ class PrivacyModeState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
-      final RxBool state = false.obs;
-      Get.put(state, tag: key);
+    if (!Get.isRegistered<RxString>(tag: key)) {
+      final RxString state = ''.obs;
+      Get.put<RxString>(state, tag: key);
     }
   }
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxString>(tag: key)) {
+      Get.delete<RxString>(tag: key);
     } else {
-      Get.find<RxBool>(tag: key).value = false;
+      Get.find<RxString>(tag: key).value = '';
     }
   }
 
-  static RxBool find(String id) => Get.find<RxBool>(tag: tag(id));
+  static RxString find(String id) => Get.find<RxString>(tag: tag(id));
 }
 
 class BlockInputState {
@@ -32,9 +33,9 @@ class BlockInputState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxBool>(tag: key)) {
       final RxBool state = false.obs;
-      Get.put(state, tag: key);
+      Get.put<RxBool>(state, tag: key);
     } else {
       Get.find<RxBool>(tag: key).value = false;
     }
@@ -42,8 +43,8 @@ class BlockInputState {
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxBool>(tag: key)) {
+      Get.delete<RxBool>(tag: key);
     }
   }
 
@@ -55,9 +56,9 @@ class CurrentDisplayState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxInt>(tag: key)) {
       final RxInt state = RxInt(0);
-      Get.put(state, tag: key);
+      Get.put<RxInt>(state, tag: key);
     } else {
       Get.find<RxInt>(tag: key).value = 0;
     }
@@ -65,8 +66,8 @@ class CurrentDisplayState {
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxInt>(tag: key)) {
+      Get.delete<RxInt>(tag: key);
     }
   }
 
@@ -104,16 +105,16 @@ class ConnectionTypeState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<ConnectionType>(tag: key)) {
       final ConnectionType collectionType = ConnectionType();
-      Get.put(collectionType, tag: key);
+      Get.put<ConnectionType>(collectionType, tag: key);
     }
   }
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<ConnectionType>(tag: key)) {
+      Get.delete<ConnectionType>(tag: key);
     }
   }
 
@@ -126,9 +127,9 @@ class FingerprintState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxString>(tag: key)) {
       final RxString state = ''.obs;
-      Get.put(state, tag: key);
+      Get.put<RxString>(state, tag: key);
     } else {
       Get.find<RxString>(tag: key).value = '';
     }
@@ -136,8 +137,8 @@ class FingerprintState {
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxString>(tag: key)) {
+      Get.delete<RxString>(tag: key);
     }
   }
 
@@ -149,9 +150,9 @@ class ShowRemoteCursorState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxBool>(tag: key)) {
       final RxBool state = false.obs;
-      Get.put(state, tag: key);
+      Get.put<RxBool>(state, tag: key);
     } else {
       Get.find<RxBool>(tag: key).value = false;
     }
@@ -159,8 +160,31 @@ class ShowRemoteCursorState {
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxBool>(tag: key)) {
+      Get.delete<RxBool>(tag: key);
+    }
+  }
+
+  static RxBool find(String id) => Get.find<RxBool>(tag: tag(id));
+}
+
+class ShowRemoteCursorLockState {
+  static String tag(String id) => 'show_remote_cursor_lock_$id';
+
+  static void init(String id) {
+    final key = tag(id);
+    if (!Get.isRegistered<RxBool>(tag: key)) {
+      final RxBool state = false.obs;
+      Get.put<RxBool>(state, tag: key);
+    } else {
+      Get.find<RxBool>(tag: key).value = false;
+    }
+  }
+
+  static void delete(String id) {
+    final key = tag(id);
+    if (Get.isRegistered<RxBool>(tag: key)) {
+      Get.delete<RxBool>(tag: key);
     }
   }
 
@@ -172,10 +196,10 @@ class KeyboardEnabledState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxBool>(tag: key)) {
       // Server side, default true
       final RxBool state = true.obs;
-      Get.put(state, tag: key);
+      Get.put<RxBool>(state, tag: key);
     } else {
       Get.find<RxBool>(tag: key).value = true;
     }
@@ -183,8 +207,8 @@ class KeyboardEnabledState {
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxBool>(tag: key)) {
+      Get.delete<RxBool>(tag: key);
     }
   }
 
@@ -196,9 +220,9 @@ class RemoteCursorMovedState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxBool>(tag: key)) {
       final RxBool state = false.obs;
-      Get.put(state, tag: key);
+      Get.put<RxBool>(state, tag: key);
     } else {
       Get.find<RxBool>(tag: key).value = false;
     }
@@ -206,8 +230,8 @@ class RemoteCursorMovedState {
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxBool>(tag: key)) {
+      Get.delete<RxBool>(tag: key);
     }
   }
 
@@ -219,9 +243,9 @@ class RemoteCountState {
 
   static void init() {
     final key = tag();
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxInt>(tag: key)) {
       final RxInt state = 1.obs;
-      Get.put(state, tag: key);
+      Get.put<RxInt>(state, tag: key);
     } else {
       Get.find<RxInt>(tag: key).value = 1;
     }
@@ -229,8 +253,8 @@ class RemoteCountState {
 
   static void delete() {
     final key = tag();
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxInt>(tag: key)) {
+      Get.delete<RxInt>(tag: key);
     }
   }
 
@@ -242,9 +266,9 @@ class PeerBoolOption {
 
   static void init(String id, String opt, bool Function() init_getter) {
     final key = tag(id, opt);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxBool>(tag: key)) {
       final RxBool value = RxBool(init_getter());
-      Get.put(value, tag: key);
+      Get.put<RxBool>(value, tag: key);
     } else {
       Get.find<RxBool>(tag: key).value = init_getter();
     }
@@ -252,8 +276,8 @@ class PeerBoolOption {
 
   static void delete(String id, String opt) {
     final key = tag(id, opt);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxBool>(tag: key)) {
+      Get.delete<RxBool>(tag: key);
     }
   }
 
@@ -266,9 +290,9 @@ class PeerStringOption {
 
   static void init(String id, String opt, String Function() init_getter) {
     final key = tag(id, opt);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxString>(tag: key)) {
       final RxString value = RxString(init_getter());
-      Get.put(value, tag: key);
+      Get.put<RxString>(value, tag: key);
     } else {
       Get.find<RxString>(tag: key).value = init_getter();
     }
@@ -276,8 +300,8 @@ class PeerStringOption {
 
   static void delete(String id, String opt) {
     final key = tag(id, opt);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxString>(tag: key)) {
+      Get.delete<RxString>(tag: key);
     }
   }
 
@@ -290,9 +314,9 @@ class UnreadChatCountState {
 
   static void init(String id) {
     final key = tag(id);
-    if (!Get.isRegistered(tag: key)) {
+    if (!Get.isRegistered<RxInt>(tag: key)) {
       final RxInt state = RxInt(0);
-      Get.put(state, tag: key);
+      Get.put<RxInt>(state, tag: key);
     } else {
       Get.find<RxInt>(tag: key).value = 0;
     }
@@ -300,8 +324,8 @@ class UnreadChatCountState {
 
   static void delete(String id) {
     final key = tag(id);
-    if (Get.isRegistered(tag: key)) {
-      Get.delete(tag: key);
+    if (Get.isRegistered<RxInt>(tag: key)) {
+      Get.delete<RxInt>(tag: key);
     }
   }
 
@@ -314,10 +338,12 @@ initSharedStates(String id) {
   CurrentDisplayState.init(id);
   KeyboardEnabledState.init(id);
   ShowRemoteCursorState.init(id);
+  ShowRemoteCursorLockState.init(id);
   RemoteCursorMovedState.init(id);
   FingerprintState.init(id);
-  PeerBoolOption.init(id, 'zoom-cursor', () => false);
+  PeerBoolOption.init(id, kOptionZoomCursor, () => false);
   UnreadChatCountState.init(id);
+  if (isMobile) ConnectionTypeState.init(id); // desktop in other places
 }
 
 removeSharedStates(String id) {
@@ -325,9 +351,11 @@ removeSharedStates(String id) {
   BlockInputState.delete(id);
   CurrentDisplayState.delete(id);
   ShowRemoteCursorState.delete(id);
+  ShowRemoteCursorLockState.delete(id);
   KeyboardEnabledState.delete(id);
   RemoteCursorMovedState.delete(id);
   FingerprintState.delete(id);
-  PeerBoolOption.delete(id, 'zoom-cursor');
+  PeerBoolOption.delete(id, kOptionZoomCursor);
   UnreadChatCountState.delete(id);
+  if (isMobile) ConnectionTypeState.delete(id);
 }

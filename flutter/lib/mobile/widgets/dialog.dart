@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hbb/common/widgets/setting_widgets.dart';
+import 'package:flutter_hbb/common/widgets/toolbar.dart';
 import 'package:get/get.dart';
 
 import '../../common.dart';
@@ -170,7 +171,7 @@ void showServerSettingsWithValue(
         isInProgress = true;
       });
       bool ret = await setServerConfig(
-          controllers,
+          null,
           errMsgs,
           ServerConfig(
               idServer: idCtrl.text.trim(),
@@ -204,14 +205,15 @@ void showServerSettingsWithValue(
                     )
                   ] +
                   [
-                    TextFormField(
-                      controller: relayCtrl,
-                      decoration: InputDecoration(
-                          labelText: translate('Relay Server'),
-                          errorText: relayServerMsg.value.isEmpty
-                              ? null
-                              : relayServerMsg.value),
-                    )
+                    if (isAndroid)
+                      TextFormField(
+                        controller: relayCtrl,
+                        decoration: InputDecoration(
+                            labelText: translate('Relay Server'),
+                            errorText: relayServerMsg.value.isEmpty
+                                ? null
+                                : relayServerMsg.value),
+                      )
                   ] +
                   [
                     TextFormField(
@@ -259,11 +261,26 @@ void showServerSettingsWithValue(
   });
 }
 
-Future<String?> validateAsync(String value) async {
-  value = value.trim();
-  if (value.isEmpty) {
-    return null;
-  }
-  final res = await bind.mainTestIfValidServer(server: value);
-  return res.isEmpty ? null : res;
+void setPrivacyModeDialog(
+  OverlayDialogManager dialogManager,
+  List<TToggleMenu> privacyModeList,
+  RxString privacyModeState,
+) async {
+  dialogManager.dismissAll();
+  dialogManager.show((setState, close, context) {
+    return CustomAlertDialog(
+      title: Text(translate('Privacy mode')),
+      content: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: privacyModeList
+              .map((value) => CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                    title: value.child,
+                    value: value.value,
+                    onChanged: value.onChanged,
+                  ))
+              .toList()),
+    );
+  }, backDismiss: true, clickMaskDismiss: true);
 }

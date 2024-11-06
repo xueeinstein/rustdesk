@@ -2,6 +2,8 @@ use hbb_common::regex::Regex;
 use std::ops::Deref;
 
 mod ar;
+mod be;
+mod bg;
 mod ca;
 mod cn;
 mod cs;
@@ -11,8 +13,12 @@ mod el;
 mod en;
 mod eo;
 mod es;
+mod et;
+mod eu;
 mod fa;
 mod fr;
+mod he;
+mod hr;
 mod hu;
 mod id;
 mod it;
@@ -21,6 +27,7 @@ mod ko;
 mod kz;
 mod lt;
 mod lv;
+mod nb;
 mod nl;
 mod pl;
 mod ptbr;
@@ -34,7 +41,7 @@ mod sv;
 mod th;
 mod tr;
 mod tw;
-mod ua;
+mod uk;
 mod vn;
 
 pub const LANGS: &[(&str, &str)] = &[
@@ -43,11 +50,16 @@ pub const LANGS: &[(&str, &str)] = &[
     ("fr", "Français"),
     ("de", "Deutsch"),
     ("nl", "Nederlands"),
+    ("nb", "Norsk bokmål"),
     ("zh-cn", "简体中文"),
     ("zh-tw", "繁體中文"),
     ("pt", "Português"),
     ("es", "Español"),
+    ("et", "Eesti keel"),
+    ("eu", "Euskara"),
     ("hu", "Magyar"),
+    ("bg", "Български"),
+    ("be", "Беларуская"),
     ("ru", "Русский"),
     ("sk", "Slovenčina"),
     ("id", "Indonesia"),
@@ -60,7 +72,7 @@ pub const LANGS: &[(&str, &str)] = &[
     ("ja", "日本語"),
     ("ko", "한국어"),
     ("kz", "Қазақ"),
-    ("ua", "Українська"),
+    ("uk", "Українська"),
     ("fa", "فارسی"),
     ("ca", "Català"),
     ("el", "Ελληνικά"),
@@ -73,15 +85,18 @@ pub const LANGS: &[(&str, &str)] = &[
     ("lt", "Lietuvių"),
     ("lv", "Latviešu"),
     ("ar", "العربية"),
+    ("he", "עברית"),
+    ("hr", "Hrvatski"),
 ];
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub fn translate(name: String) -> String {
-    let locale = sys_locale::get_locale().unwrap_or_default().to_lowercase();
+    let locale = sys_locale::get_locale().unwrap_or_default();
     translate_locale(name, &locale)
 }
 
 pub fn translate_locale(name: String, locale: &str) -> String {
+    let locale = locale.to_lowercase();
     let mut lang = hbb_common::config::LocalConfig::get_option("lang").to_lowercase();
     if lang.is_empty() {
         // zh_CN on Linux, zh-Hans-CN on mac, zh_CN_#Hans on Android
@@ -109,8 +124,11 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "it" => it::T.deref(),
         "zh-tw" => tw::T.deref(),
         "de" => de::T.deref(),
+        "nb" => nb::T.deref(),
         "nl" => nl::T.deref(),
         "es" => es::T.deref(),
+        "et" => et::T.deref(),
+        "eu" => eu::T.deref(),
         "hu" => hu::T.deref(),
         "ru" => ru::T.deref(),
         "eo" => eo::T.deref(),
@@ -126,7 +144,7 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "ja" => ja::T.deref(),
         "ko" => ko::T.deref(),
         "kz" => kz::T.deref(),
-        "ua" => ua::T.deref(),
+        "uk" => uk::T.deref(),
         "fa" => fa::T.deref(),
         "ca" => ca::T.deref(),
         "el" => el::T.deref(),
@@ -139,6 +157,10 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         "lt" => lt::T.deref(),
         "lv" => lv::T.deref(),
         "ar" => ar::T.deref(),
+        "bg" => bg::T.deref(),
+        "be" => be::T.deref(),
+        "he" => he::T.deref(),
+        "hr" => hr::T.deref(),
         _ => en::T.deref(),
     };
     let (name, placeholder_value) = extract_placeholder(&name);
@@ -147,17 +169,26 @@ pub fn translate_locale(name: String, locale: &str) -> String {
         if let Some(value) = placeholder_value.as_ref() {
             s = s.replace("{}", &value);
         }
+        if !crate::is_rustdesk() {
+            if s.contains("RustDesk")
+                && !name.starts_with("upgrade_rustdesk_server_pro")
+                && name != "powered_by_me"
+            {
+                s = s.replace("RustDesk", &crate::get_app_name());
+            }
+        }
         s
     };
     if let Some(v) = m.get(&name as &str) {
-        if v.is_empty() {
-            if lang != "en" {
-                if let Some(v) = en::T.get(&name as &str) {
-                    return replace(v);
-                }
-            }
-        } else {
+        if !v.is_empty() {
             return replace(v);
+        }
+    }
+    if lang != "en" {
+        if let Some(v) = en::T.get(&name as &str) {
+            if !v.is_empty() {
+                return replace(v);
+            }
         }
     }
     replace(&name.as_str())
