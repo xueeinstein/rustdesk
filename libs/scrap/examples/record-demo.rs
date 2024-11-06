@@ -133,14 +133,16 @@ impl DemoCapture {
             let now = Instant::now();
             let time = now - start;
 
-            if let Ok(frame) = screen_capturer.frame(Duration::from_millis(0)) {
-                let ms = time.as_secs() * 1000 + time.subsec_millis() as u64;
+            match screen_capturer.frame(Duration::from_millis(0)) {
+                Ok(frame) => {
+                    let ms = time.as_secs() * 1000 + time.subsec_millis() as u64;
+                    println!(">>> {}", ms);
 
-                // println!(">>> {}", ms);
-
-                for frame in vpx.encode(ms as i64, &frame, STRIDE_ALIGN).unwrap() {
-                    vt.add_frame(frame.data, frame.pts as u64 * 1_000_000, frame.key);
+                    for frame in vpx.encode(ms as i64, &frame, STRIDE_ALIGN).unwrap() {
+                        vt.add_frame(frame.data, frame.pts as u64 * 1_000_000, frame.key);
+                    }
                 }
+                Err(e) => eprintln!("Failed to capture frame: {}", e),
             }
 
             let dt = now.elapsed();
@@ -149,6 +151,7 @@ impl DemoCapture {
             }
         }
 
+        vpx.flush().unwrap();
         webm_writer.finalize(None);
         // act_buf.flush()?;
         Ok(())

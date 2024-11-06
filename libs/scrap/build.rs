@@ -9,6 +9,7 @@ fn link_pkg_config(name: &str) -> Vec<PathBuf> {
     // sometimes an override is needed
     let pc_name = match name {
         "libvpx" => "vpx",
+        "aom" => "aom",
         _ => name,
     };
     let lib = pkg_config::probe_library(pc_name)
@@ -127,6 +128,14 @@ fn link_homebrew_m1(name: &str) -> PathBuf {
 fn find_package(name: &str) -> Vec<PathBuf> {
     let no_pkg_config_var_name = format!("NO_PKG_CONFIG_{name}");
     println!("cargo:rerun-if-env-changed={no_pkg_config_var_name}");
+
+    // Special handling for aom on Linux
+    if name == "aom" && cfg!(target_os = "linux") {
+        println!("cargo:rustc-link-search=native=/usr/lib");
+        println!("cargo:rustc-link-lib=aom");  // Remove static/dylib specification
+        return vec![PathBuf::from("/usr/include")];
+    }
+
     if cfg!(all(target_os = "linux", feature = "linux-pkg-config"))
         && std::env::var(no_pkg_config_var_name).as_deref() != Ok("1")
     {
@@ -196,7 +205,7 @@ fn main() {
 
     find_package("libyuv");
     gen_vcpkg_package("libvpx", "vpx_ffi.h", "vpx_ffi.rs", "^[vV].*");
-    // gen_vcpkg_package("aom", "aom_ffi.h", "aom_ffi.rs", "^(aom|AOM|OBU|AV1).*");
+    gen_vcpkg_package("aom", "aom_ffi.h", "aom_ffi.rs", "^(aom|AOM|OBU|AV1).*");
 
     // there is problem with cfg(target_os) in build.rs, so use our workaround
     let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
